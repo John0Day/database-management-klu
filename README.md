@@ -4,7 +4,7 @@ How to Install the Project
 ---
 This Setup manual is only ment for a VS Code setup. If you want to use the Database differently, you can also just download the sql files manually.
 
-#### 1. Install Homebrew if you haven't already.
+#### 1. Install Homebrew on Mac if you haven't already. Otherwise use WSL if on Windows.
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -109,6 +109,21 @@ if you want to set a password: `psql -d postgres -c "ALTER ROLE <YOUR_USER> WITH
 #### 12. Start APP. (Should open a new Browserwindow)
 
 ```bash
+streamlit run app.py
+```
+
+#### 13. In case you closed VS Code and want to open the Project up back again
+
+```bash
+brew services restart postgresql@16
+pg_isready
+```
+#### !Navigate to the /app folder. (Drag and Drop in Terminal works too!)
+
+```bash
+cd "/Users/YOUR-PATH/event-management-db/app"
+source .venv/bin/activate
+pip install -r requirements.txt
 streamlit run app.py
 ```
 
