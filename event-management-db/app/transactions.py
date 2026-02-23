@@ -43,6 +43,30 @@ def list_staff():
         return fetch_all_dict(cur, "SELECT Staff_ID, First_Name, Last_Name FROM Staff ORDER BY Staff_ID;")
 
 
+def list_sessions():
+    with transaction() as (_, cur):
+        return fetch_all_dict(
+            cur,
+            """
+            SELECT Event_ID, Topic, Start_Time
+            FROM Session
+            ORDER BY Event_ID, Start_Time, Topic;
+            """
+        )
+
+
+def list_registrations():
+    with transaction() as (_, cur):
+        return fetch_all_dict(
+            cur,
+            """
+            SELECT Attendee_ID, Event_ID, Status
+            FROM Registration
+            ORDER BY Event_ID, Attendee_ID;
+            """
+        )
+
+
 # ---------- Creation helpers ----------
 
 def create_venue(venue_id: int, address: str, room_number: str, total_capacity: int):
@@ -183,6 +207,76 @@ def create_speaker(speaker_id: int, shift_start: str, shift_end: str, duty: str)
             (speaker_id, shift_start, shift_end, duty),
         )
     return {"speaker_id": speaker_id}
+
+
+# ---------- Deletion helpers ----------
+
+def delete_venue(venue_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Venue WHERE Venue_ID = %s;", (venue_id,))
+    return {"deleted_venue_id": venue_id}
+
+
+def delete_organizer(organizer_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Organizer WHERE Organizer_ID = %s;", (organizer_id,))
+    return {"deleted_organizer_id": organizer_id}
+
+
+def delete_event(event_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Event WHERE Event_ID = %s;", (event_id,))
+    return {"deleted_event_id": event_id}
+
+
+def delete_session(event_id: int, topic: str, start_time: str):
+    with transaction() as (_, cur):
+        execute(
+            cur,
+            "DELETE FROM Session WHERE Event_ID = %s AND Topic = %s AND Start_Time = %s;",
+            (event_id, topic, start_time),
+        )
+    return {"deleted_session": {"event_id": event_id, "topic": topic, "start_time": start_time}}
+
+
+def delete_attendee(attendee_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Attendee WHERE Attendee_ID = %s;", (attendee_id,))
+    return {"deleted_attendee_id": attendee_id}
+
+
+def delete_registration(attendee_id: int, event_id: int):
+    with transaction() as (_, cur):
+        execute(
+            cur,
+            "DELETE FROM Registration WHERE Attendee_ID = %s AND Event_ID = %s;",
+            (attendee_id, event_id),
+        )
+    return {"deleted_registration": {"attendee_id": attendee_id, "event_id": event_id}}
+
+
+def delete_sponsor(sponsor_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Sponsor WHERE Sponsor_ID = %s;", (sponsor_id,))
+    return {"deleted_sponsor_id": sponsor_id}
+
+
+def delete_equipment(serial_number: str):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Equipment WHERE Serial_Number = %s;", (serial_number,))
+    return {"deleted_equipment": serial_number}
+
+
+def delete_staff(staff_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Staff WHERE Staff_ID = %s;", (staff_id,))
+    return {"deleted_staff_id": staff_id}
+
+
+def delete_speaker(speaker_id: int):
+    with transaction() as (_, cur):
+        execute(cur, "DELETE FROM Speaker WHERE Speaker_ID = %s;", (speaker_id,))
+    return {"deleted_speaker_id": speaker_id}
 
 def tx1_inclusion(event_id=1, attendee_id=11, tx_id=11):
     with transaction() as (_, cur):
