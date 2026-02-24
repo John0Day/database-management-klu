@@ -63,6 +63,7 @@ Expected: accepting connections.
 createdb eventdb
 psql -d eventdb -f sql/01_database_creation.sql
 psql -d eventdb -f sql/02_data_insertion.sql
+psql -d eventdb -f sql/03_transactions.sql
 ```
 4) Create virtual env and install dependencies
 ```bash
