@@ -27,9 +27,7 @@ DROP TABLE IF EXISTS Event CASCADE;
 DROP TABLE IF EXISTS Organizer CASCADE;
 DROP TABLE IF EXISTS Venue CASCADE;
 
--- ============================================================
 -- Core tables
--- ============================================================
 
 CREATE TABLE Venue (
   Venue_ID        INT PRIMARY KEY,
@@ -104,9 +102,7 @@ CREATE TABLE Payment (
   Payment_Method   VARCHAR(40) NOT NULL
 );
 
--- ============================================================
 -- Relationship / weak-entity tables
--- ============================================================
 
 -- Weak entity Session identified by (Event_ID, Topic, Start_Time)
 CREATE TABLE Session (
@@ -184,16 +180,14 @@ CREATE TABLE Feedback (
     ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- ============================================================
--- Index (at least one)
--- ============================================================
+-- Index 
+
 CREATE INDEX idx_registration_event ON Registration(Event_ID);
 CREATE INDEX idx_session_event ON Session(Event_ID);
 CREATE INDEX idx_feedback_session ON Feedback(Event_ID, Topic, Start_Time);
 
--- ============================================================
--- View (at least one)
--- ============================================================
+-- View
+
 CREATE VIEW v_event_overview AS
 SELECT
   e.Event_ID,
@@ -220,11 +214,9 @@ SELECT
 FROM Feedback f
 GROUP BY f.Event_ID, f.Topic, f.Start_Time;
 
--- ============================================================
--- Trigger (at least one)
+-- Trigger
 -- Business rule: If Status = 'confirmed', Transaction_ID must be NOT NULL.
 -- Additionally, default Status = 'pending' if empty string (defensive).
--- ============================================================
 
 CREATE OR REPLACE FUNCTION trg_registration_enforce_payment()
 RETURNS TRIGGER AS $$
@@ -246,13 +238,11 @@ BEFORE INSERT OR UPDATE ON Registration
 FOR EACH ROW
 EXECUTE FUNCTION trg_registration_enforce_payment();
 
--- ============================================================
--- "Assertion" equivalent (DBMS-compatible)
+-- Assertion equivalent for SQL (DBMS-compatible)
 -- Global-ish constraint enforced at COMMIT time:
 -- For any confirmed registration, there must exist a referenced payment row.
 -- This is redundant with FK+trigger, but it behaves like an ASSERTION check
 -- and is DEFERRABLE, so it runs at transaction end.
--- ============================================================
 
 CREATE OR REPLACE FUNCTION assert_confirmed_has_payment()
 RETURNS TRIGGER AS $$
